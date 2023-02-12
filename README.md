@@ -19,6 +19,11 @@ And best of all, our framework is fully customizable, so you can tailor it to yo
 
 So why wait? Try our custom PHP MVC framework today and experience the power of fast, efficient web development!
 
+### Installation
+- Download the repo
+- Point your vhost to the /public directory
+- call - composer install
+
 ### Its for Front-End part only
 <p>It would be best if you split the administration into a separate system</p>
 
