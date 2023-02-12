@@ -8,6 +8,8 @@ class WelcomeController extends \Core\Controller
 
     public function index()
     {
-        $this->view->render('welcome');
+        $this->view->render('welcome', [
+            'name' => 'by Kiril Kirkov'
+        ]);
     }
 }
