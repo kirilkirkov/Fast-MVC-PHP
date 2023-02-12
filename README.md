@@ -25,3 +25,6 @@ So why wait? Try our custom PHP MVC framework today and experience the power of 
 #### Dependencies
 - PHP >=7.4.0
 - PDO Extension
+
+#### Execution time
+<p> It takes 0.00039100646972656 seconds to execute the script </p>
