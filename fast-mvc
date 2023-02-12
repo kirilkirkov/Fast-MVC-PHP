@@ -5,10 +5,10 @@ if(php_sapi_name() !== 'cli') {
 }
 
 $availableCommands = [
-    'clear:cache' => 'Clear all application cache',
-    'clear:cache:pdo' => 'Clear pdo cache',
-    'clear:cache:custom' => 'Clear custom cache',
-    'clear:cache:fast-route' => 'Clear fast route cache',
+    'php fast-mvc cache:clear' => 'Clear all application cache',
+    'php fast-mvc cache:clear pdo' => 'Clear pdo cache',
+    'php fast-mvc cache:clear custom' => 'Clear custom cache',
+    'php fast-mvc cache:clear fast-route' => 'Clear fast route cache',
 ];
 
 if(!isset($argv[1])) {
@@ -19,22 +19,7 @@ if(!isset($argv[1])) {
 switch($argv[1]) {
     case 'clear:cache':
         include 'core/cli/clear-cache.php';
-        clearCache();
-    break;
-
-    case 'clear:cache:pdo':
-        include 'core/cli/clear-cache.php';
-        clearCache('pdo');
-    break;
-
-    case 'clear:cache:custom':
-        include 'core/cli/clear-cache.php';
-        clearCache('custom');
-    break;
-
-    case 'clear:cache:fast-route':
-        include 'core/cli/clear-cache.php';
-        clearCache('fast-route');
+        clearCache(isset($argv[2]) ? $argv[2] : null);
     break;
 
     default:
