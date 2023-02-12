@@ -1,0 +1,46 @@
+<?php
+
+if(php_sapi_name() !== 'cli') {
+    echo 'Command line only' . PHP_EOL;
+}
+
+$availableCommands = [
+    'clear:cache' => 'Clear all application cache',
+    'clear:cache:pdo' => 'Clear pdo cache',
+    'clear:cache:custom' => 'Clear custom cache',
+    'clear:cache:fast-route' => 'Clear fast route cache',
+];
+
+if(!isset($argv[1])) {
+    echo 'Please enter a command' . PHP_EOL;
+    return;
+}
+
+switch($argv[1]) {
+    case 'clear:cache':
+        include 'core/cli/clear-cache.php';
+        clearCache();
+    break;
+
+    case 'clear:cache:pdo':
+        include 'core/cli/clear-cache.php';
+        clearCache('pdo');
+    break;
+
+    case 'clear:cache:custom':
+        include 'core/cli/clear-cache.php';
+        clearCache('custom');
+    break;
+
+    case 'clear:cache:fast-route':
+        include 'core/cli/clear-cache.php';
+        clearCache('fast-route');
+    break;
+
+    default:
+        echo PHP_EOL . 'Available commands:' . PHP_EOL . PHP_EOL;
+        foreach($availableCommands as $command => $description) {
+            echo "php fast-mvc {$command} - {$description}" . PHP_EOL;
+        }
+        echo PHP_EOL;
+}
