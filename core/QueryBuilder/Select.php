@@ -95,7 +95,7 @@ class Select implements QueryInterface
 
     public function innerJoin(string ...$join): self
     {
-        $this->leftJoin = [];
+        $this->innerJoin = [];
         foreach ($join as $arg) {
             $this->innerJoin[] = $arg;
         }
@@ -104,7 +104,7 @@ class Select implements QueryInterface
 
     public function leftJoin(string ...$join): self
     {
-        $this->innerJoin = [];
+        $this->leftJoin = [];
         foreach ($join as $arg) {
             $this->leftJoin[] = $arg;
         }

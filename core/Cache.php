@@ -13,9 +13,9 @@ class Cache
         return include $path . $key;
     }
 
-    public static function set(string $key, array $array, $path = App::CUSTOM_CACHE_DIR)
+    public static function set(string $key, $array, $path = App::CUSTOM_CACHE_DIR)
     {
-        if(self::isCacheDisabled($path)) {
+        if(self::isCacheDisabled($path) || !is_array($array)) {
             return false;
         }
 
