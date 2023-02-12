@@ -20,9 +20,14 @@ And best of all, our framework is fully customizable, so you can tailor it to yo
 So why wait? Try our custom PHP MVC framework today and experience the power of fast, efficient web development!
 
 ### Installation
-- Download the repo
+- composer install
 - Point your vhost to the /public directory
-- call - composer install
+
+### Available CLI Commands
+- php fast-mvc clear:cache - Clear all application cache
+- php fast-mvc clear:cache:pdo - Clear pdo cache
+- php fast-mvc clear:cache:custom - Clear custom cache
+- php fast-mvc clear:cache:fast-route - Clear fast route cache
 
 ### Its for Front-End part only
 <p>It would be best if you split the administration into a separate system</p>
