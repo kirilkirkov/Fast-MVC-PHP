@@ -1,5 +1,6 @@
 <div class="kirilkirkov__fast-mvc">
-    <?= $msg ?>
+    <div><?= $execution_time ?></div>
+    <div><?= $mem_usage ?></div>
 </div>
 <style>
 .kirilkirkov__fast-mvc {

@@ -35,3 +35,4 @@ require __DIR__.'/../core/Helpers.php';
 require __DIR__.'/../core/Request.php';
 $request = new Core\Request();
 $request->handle();
+$request->appEnd();

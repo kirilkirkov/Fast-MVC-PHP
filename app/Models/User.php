@@ -9,10 +9,6 @@ class User
 {
     public function getUser($id)
     {
-        if(Cache::get("user_{$id}")) {
-            return Cache::get("user_{$id}");
-        }
-
         $db = DB::getInstance();
         $q = $db->query()
         ->select('email')
@@ -23,8 +19,6 @@ class User
             'id' => $id, 
             'is_confirmed' => 1
         ]);
-
-        Cache::set("user_{$id}", $result);
 
         return $result;
     }

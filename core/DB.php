@@ -27,15 +27,18 @@ class DB
      */
     protected function __construct()
     {
+        $dbDriver = env('DB_DRIVER');
         $serverName = env('DB_HOST');
+        $dbCharset = env('DB_CHARSET', 'utf8');
         $dbName = env('DB_NAME');
         $dbUser = env('DB_USER');
         $dbPass = env('DB_PASS');
 
         try {
-            $this->conn = new \PDO("mysql:host={$serverName};dbname={$dbName}", $dbUser, $dbPass);
+            $this->conn = new \PDO("{$dbDriver}:host={$serverName};dbname={$dbName}", $dbUser, $dbPass);
             // set the PDO error mode to exception
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $this->conn->exec("SET CHARACTER SET '" . $dbCharset . "'");
         } catch(\PDOException $e) {
             if(env('DEBUG_MODE', false) === true) {
                 echo "Connection failed: " . $e->getMessage();
@@ -55,29 +58,60 @@ class DB
         return self::$instance;
     }
 
+    /**
+     * Get query builder
+     */
     public function query()
     {
         return new QueryBuilder();
     }
 
+    /**
+     * Execute prepare statement
+     */
     public function execute($query, array $params, $type = 'all')
     {
         $q = $this->conn->prepare($query);
+
+        $qKey = sha1($this->getRawQuery($params, $q->queryString));
+        if(Cache::get($qKey, App::PDO_CACHE_DIR)) {
+            return Cache::get($qKey);
+        }
+
         $q->execute($params);
         
         if($type === 'all') {
-            return $q->fetchAll(\PDO::FETCH_ASSOC);
+            $result = $q->fetchAll(\PDO::FETCH_ASSOC);
+            Cache::set($qKey, $result);
+            return $result;
         }
-        return $q->fetch(\PDO::FETCH_ASSOC);
+        $result =  $q->fetch(\PDO::FETCH_ASSOC);
+        Cache::set($qKey, $result, App::PDO_CACHE_DIR);
+        return $result;
     }
 
+    /**
+     * Execute prepare statement with fetch
+     */
     public function first($query, array $params)
     {
-        return $this->execute($query, $params, 'one');
+        return $this->execute($query, $params, 'first');
     }
 
+    /**
+     * Execute prepare statement with fetchAll
+     */
     public function get($query, array $params)
     {
         return $this->execute($query, $params, 'all');
+    }
+
+    private function getRawQuery(array $params, string $queryString)
+    {
+        foreach ($params as $k => $v) {
+            $params[':'.$k] = $v;
+            unset($params[$k]);
+        }
+        return str_replace(array_keys($params), array_values($params), $queryString);
     }
 }

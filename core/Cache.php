@@ -2,27 +2,34 @@
 
 namespace Core;
 
-use Core\Route;
-
 class Cache
 {
-    public static function get(string $key)
+    public static function get(string $key, $path = App::CUSTOM_CACHE_DIR)
     {
-        if(file_exists(App::CACHE_DIR . $key)) {
-            return include App::CACHE_DIR . $key;
+        if(self::isCacheDisabled($path) || !file_exists($path . $key)) {
+            return false;
         }
 
-        return false;
+        return include $path . $key;
     }
 
-    public static function set(string $key, array $array)
+    public static function set(string $key, array $array, $path = App::CUSTOM_CACHE_DIR)
     {
-        if(!is_dir(App::CACHE_DIR)) {
-            mkdir(App::CACHE_DIR, 0770, true);
+        if(self::isCacheDisabled($path)) {
+            return false;
         }
 
-        $file = fopen(App::CACHE_DIR . $key, "w");
+        $file = fopen($path . $key, "w");
         fwrite($file, '<?php '.PHP_EOL.'return '.var_export($array, true).';');
         fclose($file);
+    }
+
+    private static function isCacheDisabled(string $path)
+    {
+        if($path === App::CUSTOM_CACHE_DIR && env('CUSTOM_CACHE_ENABLED', false) === false
+        || $path === App::PDO_CACHE_DIR && env('PDO_CACHE_ENABLED', false) === false) {
+            return true;
+        }
+        return false;
     }
 }
