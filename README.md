@@ -31,10 +31,10 @@ So why wait? Try our custom PHP MVC framework today and experience the power of 
 - Point your vhost to the /public directory
 
 ### Available CLI Commands
-- php fast-mvc clear:cache - Clear all application cache
-- php fast-mvc clear:cache:pdo - Clear pdo cache
-- php fast-mvc clear:cache:custom - Clear custom cache
-- php fast-mvc clear:cache:fast-route - Clear fast route cache
+- php fast-mvc cache:clear - Clear all application cache
+- php fast-mvc cache:clear pdo - Clear pdo cache
+- php fast-mvc cache:clear custom - Clear custom cache
+- php fast-mvc cache:clear fast-route - Clear fast route cache
 
 ### Its for Front-End part only
 <p>It would be best if you split the administration into a separate system</p>
