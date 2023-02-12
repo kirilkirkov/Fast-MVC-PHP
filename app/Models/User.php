@@ -16,12 +16,12 @@ class User
         $db = DB::getInstance();
         $q = $db->query()
         ->select('email')
-        ->where('id = :id', 'email = :email')
+        ->where('id = :id', 'is_confirmed = :is_confirmed')
         ->from('users');
 
         $result = $db->first($q, [
-            'id' => 10, 
-            'email' => 'user-10@user-10.email'
+            'id' => $id, 
+            'is_confirmed' => 1
         ]);
 
         Cache::set("user_{$id}", $result);
