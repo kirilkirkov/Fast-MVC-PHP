@@ -1,7 +1,7 @@
 # Fast-MVC-PHP
 Fast loading mvc framework with FastRoute integrated and Caching system
 
-![PayPal Ecommerce Integration](https://raw.githubusercontent.com/kirilkirkov/Fast-MVC-PHP/main/public/images/fast-mvc-php.png "Paypal Integration")
+![Fast MVC PHP](https://raw.githubusercontent.com/kirilkirkov/Fast-MVC-PHP/main/public/images/fast-mvc-php.png "Fast MVC PHP")
 
 **Fast MVC PHP** – a powerful and lightning-fast solution for your web development needs.
 
@@ -18,6 +18,13 @@ We've also included a robust routing system that allows you to easily map URLs t
 And best of all, our framework is fully customizable, so you can tailor it to your specific needs. Whether you're building a simple blog or a complex web application, our framework can handle it all.
 
 So why wait? Try our custom PHP MVC framework today and experience the power of fast, efficient web development!
+
+## Donate
+<p>If this project help you reduce time to develop, you can give me a cup of coffee to continue its development. Thank you! :)</p>
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=W5BR6K29BQX7E)
+
+<p><b>BTC Address:</b> 3FmdTVWCApEcHT6wmrSCFkUSqaowsaqS9Y</p>
 
 ### Installation
 - composer install
