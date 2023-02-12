@@ -1,0 +1,23 @@
+{
+    "name": "kirilkirkov/fast-mvc",
+    "description": "Fast MVC for PHP",
+    "keywords": ["fast mvc", "fast mvc php"],
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "autoload": {
+        "psr-4": {
+            "Core\\": "core/",
+            "App\\Models\\": "app/Models/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Kiril Kirkov",
+            "email": "kiro_tyson@abv.bg"
+        }
+    ],
+    "require": {
+        "php": ">=7.4.0",
+        "nikic/fast-route": "^1.3"
+    }
+}

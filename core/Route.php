@@ -33,6 +33,8 @@ class Route
      */
     public static function getRoutes()
     {
-        return self::$routes;
+        $routes = self::$routes;
+        self::$routes = [];
+        return $routes;
     }
 }

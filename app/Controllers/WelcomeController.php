@@ -2,10 +2,12 @@
 
 namespace App\Controllers;
 
-class WelcomeController
+class WelcomeController extends \Core\Controller
 {
+    public const LAYOUT = 'layouts/main';
+
     public function index()
     {
-        echo 'hello from index';
+        $this->view->render('welcome');
     }
 }

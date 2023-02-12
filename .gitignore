@@ -1,0 +1,3 @@
+/cache/pdo/*
+/vendor
+composer.lock

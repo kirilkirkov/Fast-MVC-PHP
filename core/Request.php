@@ -6,25 +6,12 @@ use Core\Route;
 
 class Request
 {
-    private const ROUTES_DIR = __DIR__ . '/../routes/';
-    private const CONTROLLERS_DIR = __DIR__ . '/../app/Controllers/';
-
     /**
      * Load Route Files
      */
     public function handle()
     {
-        if ($handle = opendir(self::ROUTES_DIR)) {
-            while (false !== ($entry = readdir($handle))) {
-                if(pathinfo($entry, PATHINFO_EXTENSION) !== 'php') {
-                    continue;
-                }
-
-                include self::ROUTES_DIR . $entry;
-            }
-            closedir($handle);
-        }
-
+        include App::ROUTES_DIR . 'routes.php';
         $this->loadRoutes();
     }
 
@@ -35,7 +22,7 @@ class Request
     {
         $routes = Route::getRoutes();
         if(!count($routes)) {
-            return;   
+            return $this->noRoutesFound();   
         }
 
         $dispatcher = \FastRoute\simpleDispatcher(function(\FastRoute\RouteCollector $r) use ($routes) {
@@ -43,6 +30,7 @@ class Request
                 $r->addRoute($route['httpMethod'], $route['route'], $route['handler']);
             }
         });
+        unset($routes);
         
         $httpMethod = $_SERVER['REQUEST_METHOD'];
         $uri = $_SERVER['REQUEST_URI'];
@@ -54,38 +42,80 @@ class Request
         $uri = rawurldecode($uri);
         
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
+        $this->parseRequest($routeInfo);
+    }
+
+    private function parseRequest($routeInfo)
+    {
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::NOT_FOUND:
-                // ... 404 Not Found
+                (new View())->setResponseStatus(404)->render('default/404');
+                $this->appEnd();
                 break;
             case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
-                // ... 405 Method Not Allowed
+                (new View())->setResponseStatus(405)->render('default/405', $allowedMethods);
+                $this->appEnd();
                 break;
             case \FastRoute\Dispatcher::FOUND:
                 $handler = $routeInfo[1];
                 $vars = $routeInfo[2];
 
                 $handler = explode('@', $handler);
-                $class = self::CONTROLLERS_DIR . trim(str_replace('\\', '/', $handler[0]), '\\') . '.php';
+                $class = App::CONTROLLERS_DIR . trim(str_replace('\\', '/', $handler[0]), '\\') . '.php';
                 
                 if(file_exists($class)) {
                     include $class;
                     
-                    $className = 'App\Controllers\\' . str_replace(self::CONTROLLERS_DIR, '', rtrim($class, '.php'));
+                    $className = 'App\Controllers\\' . str_replace(App::CONTROLLERS_DIR, '', rtrim($class, '.php'));
                     $className = str_replace('/', '\\', $className);
-                    
+
                     $obj = new $className();
                     if(!is_callable([$obj, $handler[1]])) {
-                        // method not found!
-                        echo 'method not found';
+                        (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'Method not found']);
+                        return $this->appEnd();
+                    }
+                    
+                    // if has layout
+                    if(defined("{$className}::LAYOUT")) {
+                        View::layout($obj::LAYOUT);
                     }
                     call_user_func_array([$obj, $handler[1]], $vars);
+                    return $this->appEnd();
                 } else {
-                    // ... Controller Not Found
-                    echo 'Controller Not Found';
+                    (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'Controller not found']);
+                    return $this->appEnd();
                 }
-                break;
+            break;
+        }
+    }
+
+    private function noRoutesFound()
+    {
+        return (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'No routes found']);
+    }
+
+    public function getParams()
+    {
+        return $_GET;
+    }
+
+    public function postParams()
+    {
+        return $_POST;
+    }
+
+    public function requestParams()
+    {
+        return $_REQUEST;
+    }
+
+    private function appEnd()
+    {
+        define('FAST_MVC_END', microtime(true));
+        if(env('DEBUG_MODE', false) === true) {
+            $execution_time = (FAST_MVC_END - FAST_MVC_START);
+            (new View())->view('debug/bar', ['msg' => " It takes ".$execution_time." seconds to execute the script"]);
         }
     }
 }
