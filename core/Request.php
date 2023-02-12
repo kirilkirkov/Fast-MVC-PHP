@@ -49,12 +49,12 @@ class Request
     {
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::NOT_FOUND:
-                (new View())->setResponseStatus(404)->render('default/404');
+                (new View())->setResponseStatus(404)->render('errors/404');
                 $this->appEnd();
                 break;
             case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
-                (new View())->setResponseStatus(405)->render('default/405', $allowedMethods);
+                (new View())->setResponseStatus(405)->render('errors/405', $allowedMethods);
                 $this->appEnd();
                 break;
             case \FastRoute\Dispatcher::FOUND:
@@ -65,7 +65,6 @@ class Request
                 $class = App::CONTROLLERS_DIR . trim(str_replace('\\', '/', $handler[0]), '\\') . '.php';
                 
                 if(file_exists($class)) {
-                    include $class;
                     
                     $className = 'App\Controllers\\' . str_replace(App::CONTROLLERS_DIR, '', rtrim($class, '.php'));
                     $className = str_replace('/', '\\', $className);
