@@ -24,7 +24,7 @@ So why wait? Try our custom PHP MVC framework today and experience the power of 
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=W5BR6K29BQX7E)
 
-<p><b>BTC Address:</b> 3Qwge1rMAqb7ko3g6AeJraV4ms1pDu2pFd</p>
+<p><b>BTC Address:</b> 3FmdTVWCApEcHT6wmrSCFkUSqaowsaqS9Y</p>
 
 ### Installation
 - composer install
