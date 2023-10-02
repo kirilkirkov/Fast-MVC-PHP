@@ -27,3 +27,15 @@ if (!function_exists('dd')) {
         exit();
     }
 }
+
+if (!function_exists('app')) {
+    function app($method = null) {
+        $app = \Core\App::getInstance();
+
+        if ($method === null) {
+            return $app;
+        }
+
+        return $app->$method();
+    }
+}

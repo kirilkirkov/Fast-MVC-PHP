@@ -8,7 +8,10 @@
         "psr-4": {
             "Core\\": "core/",
             "App\\Models\\": "app/Models/",
-            "App\\Controllers\\": "app/Controllers/"
+            "App\\Controllers\\": "app/Controllers/",
+            "App\\Services\\": "app/Services/",
+            "App\\Providers\\": "app/Providers/",
+            "App\\Bootstrap\\": "app/Bootstrap/"
         }
     },
     "authors": [

@@ -18,4 +18,65 @@ class App
 
     public const _LAYOUT_CONTENT_ = '_LAYOUT_CONTENT_';
     public const ENV_FILE = __DIR__ . '/../env.php';
+
+    private static $instance;
+    private $iocContainer;
+
+    private function __construct()
+    {
+        $this->registerServices();
+        $this->dispatchKernel(); // should be last one
+    }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * Service container
+     */
+    public function registerServices()
+    {
+        $container = new \Core\Container();
+
+        $servicesFile = __DIR__.'/../config/services.php';
+        if (!file_exists($servicesFile)) {
+            return;
+        }
+        $services = require $servicesFile;
+
+        foreach ($services['bindings'] as $abstract => $concrete) {
+            $container->bind($abstract, $concrete);
+        }
+        
+        foreach ($services['singletons'] as $abstract => $concrete) {
+            $container->singleton($abstract, $concrete);
+        }
+
+        $this->setContainer($container);
+    }
+
+    private function setContainer($container)
+    {
+        $this->iocContainer = $container;
+    }
+
+    public function getService($abstract, ...$parameters)
+    {
+        return $this->iocContainer->make($abstract, $parameters);
+    }
+
+    /**
+     * Kernel
+     */
+    public function dispatchKernel()
+    {
+        $kernel = new \App\Bootstrap\Kernel();
+        $kernel->dispatch();
+    }
 }

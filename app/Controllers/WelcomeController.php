@@ -8,6 +8,9 @@ class WelcomeController extends \Core\Controller
 
     public function index()
     {
+        $singletonService  = app()->getService('SingletonService');
+        $bindService = app()->getService('BindService');
+
         $this->view->render('welcome', [
             'name' => 'by Kiril Kirkov'
         ]);
