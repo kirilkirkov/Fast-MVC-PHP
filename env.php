@@ -3,6 +3,7 @@
 return [
     // show execution time of app start-to-end
     'DEBUG_MODE' => true,
+    'MINIFY_HTML' => true,
 
     // cache
     'ROUTE_CACHE_ENABLED' => true,

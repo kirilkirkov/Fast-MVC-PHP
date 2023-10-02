@@ -29,10 +29,35 @@ class View
         include App::VIEWS_DIR . "$view.php";
         $renderContent = ob_get_clean();
         if($layoutContent === null) {
-            echo $renderContent;
+            echo $this->minifyHtml($renderContent);
         } else {
-            echo str_replace(App::_LAYOUT_CONTENT_, $renderContent, $layoutContent);
+            echo $this->minifyHtml(str_replace(App::_LAYOUT_CONTENT_, $renderContent, $layoutContent));
         }
+    }
+
+    private function minifyHtml($code)
+    {
+        if(env('MINIFY_HTML') !== true) {
+            return $code;
+        }
+        
+        $search = array(
+         
+            // Remove whitespaces after tags
+            '/\>[^\S ]+/s',
+             
+            // Remove whitespaces before tags
+            '/[^\S ]+\</s',
+             
+            // Remove multiple whitespace sequences
+            '/(\s)+/s',
+             
+            // Removes comments
+            '/<!--(.|\s)*?-->/'
+        );
+        $replace = array('>', '<', '\\1');
+        $code = preg_replace($search, $replace, $code);
+        return $code;
     }
 
     /**
