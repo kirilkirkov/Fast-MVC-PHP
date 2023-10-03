@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Core\DB;
 use Core\Cache;
+use Core\Request;
 
 class User
 {
@@ -33,5 +34,24 @@ class User
         $result = $db->get($q, []);
 
         return $result;
+    }
+
+    public static function getCountAll()
+    {
+        $db = DB::getInstance();
+
+        $prepareParams = [];
+        $where = '';
+
+        $getParams = (new Request())->getParams();
+        if(isset($getParams['email']) && trim($getParams['email'] != '')) {
+            $where = 'WHERE (users.email LIKE :email)';
+            $prepareParams = [
+                'email' => '%'.trim($getParams['email']).'%',
+            ];
+        }
+
+        $result = $db->first("SELECT count(id) as cnt FROM users {$where}", $prepareParams);
+        return $result['cnt'];
     }
 }
