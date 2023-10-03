@@ -28,6 +28,18 @@ if (!function_exists('dd')) {
     }
 }
 
+if (!function_exists('truncateText')) {
+    function truncateText(string $text, $length = 200) {
+        return mb_strlen($text) > $length ? mb_substr($text, 0, $length)."..." : $text;
+    }
+}
+
+if (!function_exists('description')) {
+    function description(string $text) {
+        return truncateText(str_replace("\r", '', str_replace("\n", '', trim(strip_tags($text)))), 200);
+    }
+}
+
 if (!function_exists('app')) {
     function app($method = null) {
         $app = \Core\App::getInstance();

@@ -41,6 +41,11 @@ class Select implements QueryInterface
      */
     private $limit;
 
+    /**
+     * @var int|null
+     */
+    private $offset;
+
     public function __construct(array $select)
     {
         $this->fields = $select;
@@ -62,7 +67,8 @@ class Select implements QueryInterface
             . ($this->innerJoin === [] ? '' : ' INNER JOIN '. implode(' INNER JOIN ', $this->innerJoin))
             . ($this->conditions === [] ? '' : ' WHERE ' . implode(' AND ', $this->conditions))
             . ($this->order === [] ? '' : ' ORDER BY ' . implode(', ', $this->order))
-            . ($this->limit === null ? '' : ' LIMIT ' . $this->limit);
+            . ($this->limit === null ? '' : ' LIMIT ' . $this->limit)
+            . ($this->offset === null ? '' : ' OFFSET ' . $this->offset);
     }
 
     public function where(string ...$where): self
@@ -82,6 +88,12 @@ class Select implements QueryInterface
     public function limit(int $limit): self
     {
         $this->limit = $limit;
+        return $this;
+    }
+
+    public function offset(int $offset): self
+    {
+        $this->offset = $offset;
         return $this;
     }
 

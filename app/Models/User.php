@@ -22,4 +22,16 @@ class User
 
         return $result;
     }
+
+    public function getAllSlugs()
+    {
+        $db = DB::getInstance();
+        $q = $db->query()
+        ->select('slug')
+        ->from('users');
+
+        $result = $db->get($q, []);
+
+        return $result;
+    }
 }
