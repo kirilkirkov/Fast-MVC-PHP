@@ -27,14 +27,11 @@ class Select implements QueryInterface
     private $from = [];
 
     /**
+     * Inner and left joins in the order they were added
+     *
      * @var array<string>
      */
-    private $innerJoin = [];
-
-    /**
-     * @var array<string>
-     */
-    private $leftJoin = [];
+    private $joins = [];
 
     /**
      * @var int|null
@@ -63,8 +60,7 @@ class Select implements QueryInterface
     {
         return 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . implode(', ', $this->from)
-            . ($this->leftJoin === [] ? '' : ' LEFT JOIN '. implode(' LEFT JOIN ', $this->leftJoin))
-            . ($this->innerJoin === [] ? '' : ' INNER JOIN '. implode(' INNER JOIN ', $this->innerJoin))
+            . ($this->joins === [] ? '' : ' ' . implode(' ', $this->joins))
             . ($this->conditions === [] ? '' : ' WHERE ' . implode(' AND ', $this->conditions))
             . ($this->order === [] ? '' : ' ORDER BY ' . implode(', ', $this->order))
             . ($this->limit === null ? '' : ' LIMIT ' . $this->limit)
@@ -81,7 +77,7 @@ class Select implements QueryInterface
 
     public function from(string $table, ?string $alias = null): self
     {
-        $this->from[] = $alias === null ? $table : "${table} AS ${alias}";
+        $this->from[] = $alias === null ? $table : "{$table} AS {$alias}";
         return $this;
     }
 
@@ -107,18 +103,16 @@ class Select implements QueryInterface
 
     public function innerJoin(string ...$join): self
     {
-        $this->innerJoin = [];
         foreach ($join as $arg) {
-            $this->innerJoin[] = $arg;
+            $this->joins[] = 'INNER JOIN ' . $arg;
         }
         return $this;
     }
 
     public function leftJoin(string ...$join): self
     {
-        $this->leftJoin = [];
         foreach ($join as $arg) {
-            $this->leftJoin[] = $arg;
+            $this->joins[] = 'LEFT JOIN ' . $arg;
         }
         return $this;
     }

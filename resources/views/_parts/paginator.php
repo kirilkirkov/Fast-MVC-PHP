@@ -1,37 +1,21 @@
+<?php
+    $prev = $paginator->getPrevious();
+    $next = $paginator->getNext();
+    $slug = e($paginator->getSlug());
+    $queryParams = e($paginator->getQueryParams());
+?>
 <div>
-    <?php
-        $prev = $paginator->getPrevious();
-        if($prev !== false) {
-        ?>
-    <a href="<?= $paginator->getSlug().'1'.$paginator->getQueryParams() ?>">
-        First
-    </a>
-        <?php
-        }
-        if($prev !== false) {
-    ?>
-    <a href="<?= $paginator->getSlug().$prev.$paginator->getQueryParams() ?>">
-        Previous
-    </a>
-    <?php }
-    foreach($paginator->getRange() as $num) {
-        if($num == $paginator->currentPage) {
-    ?>
-        <a href="<?= $paginator->getSlug().$num.$paginator->getQueryParams() ?>"><?= $num ?></a>
-        <?php } else { ?>
-        <a href="<?= $paginator->getSlug().$num.$paginator->getQueryParams() ?>"><?= $num ?></a>
-    <?php
-        }
-    }
-        $next = $paginator->getNext();
-        if($next !== false) {
-    ?>
-    <a href="<?= $paginator->getSlug().$paginator->getNext().$paginator->getQueryParams() ?>">
-        Next
-    </a>
-    <?php } if($paginator->getTotalPages() > 1 && $next !== false) { ?>
-    <a href="<?= $paginator->getSlug().$paginator->getTotalPages().$paginator->getQueryParams() ?>">
-        Previous
-    </a>
+    <?php if($prev !== false) { ?>
+    <a href="<?= $slug . '1' . $queryParams ?>">First</a>
+    <a href="<?= $slug . $prev . $queryParams ?>">Previous</a>
+    <?php } ?>
+
+    <?php foreach($paginator->getRange() as $num) { ?>
+    <a href="<?= $slug . $num . $queryParams ?>"<?= $num == $paginator->currentPage ? ' aria-current="page"' : '' ?>><?= $num ?></a>
+    <?php } ?>
+
+    <?php if($next !== false) { ?>
+    <a href="<?= $slug . $next . $queryParams ?>">Next</a>
+    <a href="<?= $slug . $paginator->getLast() . $queryParams ?>">Last</a>
     <?php } ?>
 </div>

@@ -24,7 +24,7 @@ class Paginator
 
     public function getLast()
     {
-        return ($this->totalResults) * $this->limit;
+        return $this->getTotalPages();
     }
 
     public function getPrevious()
@@ -46,8 +46,9 @@ class Paginator
 
     public function getQueryParams()
     {
-        if($_SERVER['QUERY_STRING'] !== '') {
-            return '?' . $_SERVER['QUERY_STRING'];
+        $queryString = $_SERVER['QUERY_STRING'] ?? '';
+        if($queryString !== '') {
+            return '?' . $queryString;
         }
 
         return '';
@@ -55,7 +56,7 @@ class Paginator
 
     public function getTotalPages()
     {
-        return ceil($this->totalResults / $this->limit);
+        return (int) ceil($this->totalResults / $this->limit);
     }
 
     public function getRange()

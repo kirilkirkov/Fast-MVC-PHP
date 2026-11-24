@@ -35,29 +35,31 @@ class View
         }
     }
 
-    private function minifyHtml($code)
+    /**
+     * Collapse whitespace and remove html comments.
+     * Content of <pre>, <textarea>, <script> and <style> is kept untouched.
+     */
+    private function minifyHtml(string $html): string
     {
         if(env('MINIFY_HTML') !== true) {
-            return $code;
+            return $html;
         }
-        
-        $search = array(
-         
-            // Remove whitespaces after tags
-            '/\>[^\S ]+/s',
-             
-            // Remove whitespaces before tags
-            '/[^\S ]+\</s',
-             
-            // Remove multiple whitespace sequences
-            '/(\s)+/s',
-             
-            // Removes comments
-            '/<!--(.|\s)*?-->/'
-        );
-        $replace = array('>', '<', '\\1');
-        $code = preg_replace($search, $replace, $code);
-        return $code;
+
+        // replace protected blocks with placeholders and put them back after minify
+        $preserved = [];
+        $protectedHtml = preg_replace_callback('/<(pre|textarea|script|style)\b.*?<\/\1>/is', function (array $match) use (&$preserved): string {
+            $placeholder = "\x1A" . count($preserved) . "\x1A";
+            $preserved[$placeholder] = $match[0];
+
+            return $placeholder;
+        }, $html);
+
+        $minified = $protectedHtml === null ? null : preg_replace(['/<!--.*?-->/s', '/\s+/'], ['', ' '], $protectedHtml);
+        if($minified === null) {
+            return $html;
+        }
+
+        return strtr($minified, $preserved);
     }
 
     /**

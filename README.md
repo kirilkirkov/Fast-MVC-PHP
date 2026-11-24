@@ -38,7 +38,7 @@ So why wait? Try our custom PHP MVC framework today and experience the power of 
 <p>It would be best if you split the administration into a separate system</p>
 
 #### Dependencies
-- PHP >=7.4.0
+- PHP >=8.1
 - PDO Extension
 
 <p>Read more about what php frameworks are</p>

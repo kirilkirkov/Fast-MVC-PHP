@@ -5,45 +5,22 @@ namespace Core;
 use Core\QueryBuilder\QueryBuilder;
 
 /**
- * Database Configuration
- * 
- * Singleton Implementation
+ * Database (singleton)
+ *
+ * Connection is opened lazily on the first real query,
+ * so requests served entirely from the PDO cache never connect to the database.
  */
 class DB
 {
-    /**
-     * The Singleton's instance is stored in a static field. This field is an
-     * array, because we'll allow our Singleton to have subclasses. Each item in
-     * this array will be an instance of a specific Singleton's subclass. You'll
-     * see how this works in a moment.
-     */
-    private static $instance = null;
+    private static ?self $instance = null;
 
-    private $conn;
+    private ?\PDO $conn = null;
 
     /**
-     * The Singleton's constructor should always be private to prevent direct
-     * construction calls with the `new` operator.
+     * Use DB::getInstance()
      */
     protected function __construct()
     {
-        $dbDriver = env('DB_DRIVER');
-        $serverName = env('DB_HOST');
-        $dbCharset = env('DB_CHARSET', 'utf8');
-        $dbName = env('DB_NAME');
-        $dbUser = env('DB_USER');
-        $dbPass = env('DB_PASS');
-
-        try {
-            $this->conn = new \PDO("{$dbDriver}:host={$serverName};dbname={$dbName}", $dbUser, $dbPass);
-            // set the PDO error mode to exception
-            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $this->conn->exec("SET CHARACTER SET '" . $dbCharset . "'");
-        } catch(\PDOException $e) {
-            if(env('DEBUG_MODE', false) === true) {
-                echo "Connection failed: " . $e->getMessage();
-            }
-        }
     }
 
     /**
@@ -67,26 +44,24 @@ class DB
     }
 
     /**
-     * Execute prepare statement
+     * Execute SELECT prepared statement (cached in cache/pdo when PDO_CACHE_ENABLED)
      */
     public function execute($query, array $params, $type = 'all')
     {
-        $q = $this->conn->prepare($query);
+        $query = (string) $query;
+        $cacheKey = hash('xxh128', $type . '|' . $query . '|' . serialize($params));
 
-        $qKey = sha1($this->getRawQuery($params, $q->queryString));
-        if(Cache::get($qKey, App::PDO_CACHE_DIR)) {
-            return Cache::get($qKey);
+        $cached = Cache::get($cacheKey, App::PDO_CACHE_DIR);
+        if($cached !== false) {
+            return $cached;
         }
 
-        $q->execute($params);
-        
-        if($type === 'all') {
-            $result = $q->fetchAll(\PDO::FETCH_ASSOC);
-            Cache::set($qKey, $result);
-            return $result;
-        }
-        $result =  $q->fetch(\PDO::FETCH_ASSOC);
-        Cache::set($qKey, $result, App::PDO_CACHE_DIR);
+        $statement = $this->connection()->prepare($query);
+        $statement->execute($params);
+
+        $result = $type === 'all' ? $statement->fetchAll() : $statement->fetch();
+        Cache::set($cacheKey, $result, App::PDO_CACHE_DIR);
+
         return $result;
     }
 
@@ -106,12 +81,42 @@ class DB
         return $this->execute($query, $params, 'all');
     }
 
-    private function getRawQuery(array $params, string $queryString)
+    /**
+     * Execute INSERT / UPDATE / DELETE prepared statement (never cached)
+     * Returns number of affected rows
+     */
+    public function statement($query, array $params = []): int
     {
-        foreach ($params as $k => $v) {
-            $params[':'.$k] = $v;
-            unset($params[$k]);
+        $statement = $this->connection()->prepare((string) $query);
+        $statement->execute($params);
+
+        return $statement->rowCount();
+    }
+
+    public function lastInsertId(): string|false
+    {
+        return $this->connection()->lastInsertId();
+    }
+
+    private function connection(): \PDO
+    {
+        if($this->conn !== null) {
+            return $this->conn;
         }
-        return str_replace(array_keys($params), array_values($params), $queryString);
+
+        $dbDriver = env('DB_DRIVER');
+        $dsn = "{$dbDriver}:host=" . env('DB_HOST') . ';dbname=' . env('DB_NAME');
+
+        // charset in DSN instead of extra "SET CHARACTER SET" query on every connect
+        if($dbDriver === 'mysql') {
+            $dsn .= ';charset=' . env('DB_CHARSET', 'utf8mb4');
+        }
+
+        $this->conn = new \PDO($dsn, env('DB_USER'), env('DB_PASS'), [
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+        ]);
+
+        return $this->conn;
     }
 }

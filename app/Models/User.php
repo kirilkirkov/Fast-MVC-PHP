@@ -44,7 +44,7 @@ class User
         $where = '';
 
         $getParams = (new Request())->getParams();
-        if(isset($getParams['email']) && trim($getParams['email'] != '')) {
+        if(isset($getParams['email']) && trim($getParams['email']) !== '') {
             $where = 'WHERE (users.email LIKE :email)';
             $prepareParams = [
                 'email' => '%'.trim($getParams['email']).'%',

@@ -67,30 +67,27 @@ class Request
                 }
 
                 $handler = explode('@', $handler);
-                if(count($handler) < 1) {
+                if(count($handler) !== 2) {
                     return (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'Invalid Route']);
                 }
 
-                $class = App::CONTROLLERS_DIR . trim(str_replace('\\', '/', $handler[0]), '\\') . '.php';
-                
-                if(file_exists($class)) {
-                    
-                    $className = 'App\Controllers\\' . str_replace(App::CONTROLLERS_DIR, '', rtrim($class, '.php'));
-                    $className = str_replace('/', '\\', $className);
+                [$controller, $method] = $handler;
+                $className = 'App\\Controllers\\' . trim(str_replace('/', '\\', $controller), '\\');
 
-                    $obj = new $className();
-                    if(!is_callable([$obj, $handler[1]])) {
-                        return (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'Method not found']);
-                    }
-                    
-                    // if has layout
-                    if(defined("{$className}::LAYOUT")) {
-                        View::layout($obj::LAYOUT);
-                    }
-                    call_user_func_array([$obj, $handler[1]], $vars);
-                } else {
-                    (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'Controller not found']);
+                if(!class_exists($className)) {
+                    return (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'Controller not found']);
                 }
+
+                $obj = new $className();
+                if(!is_callable([$obj, $method])) {
+                    return (new View())->setResponseStatus(500)->render('errors/500', ['msg' => 'Method not found']);
+                }
+
+                // if has layout
+                if(defined("{$className}::LAYOUT")) {
+                    View::layout($obj::LAYOUT);
+                }
+                $obj->$method(...$vars);
             break;
         }
     }

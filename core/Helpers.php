@@ -3,15 +3,25 @@ use Core\App;
 
 // Helpers
 if (!function_exists('env')) {
-function env(string $key, $default = '')
+    /**
+     * Read a value from env.php. The file is loaded only once per request.
+     */
+    function env(string $key, mixed $default = ''): mixed
     {
-        $env = include App::ENV_FILE;
-        
-        if(isset($env[$key])) {
-            return $env[$key];
-        }
+        static $env = null;
+        $env ??= include App::ENV_FILE;
 
-        return $default;
+        return $env[$key] ?? $default;
+    }
+}
+
+if (!function_exists('e')) {
+    /**
+     * Escape a value for safe HTML output: <?= e($value) ?>
+     */
+    function e(string|int|float|null $value): string
+    {
+        return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 }
 
