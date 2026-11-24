@@ -16,7 +16,9 @@ class View
     public function render(string $view, array $data = [])
     {
         extract($data);
-        http_response_code($this->responseStatus);
+        if(!headers_sent()) {
+            http_response_code($this->responseStatus);
+        }
 
         $layoutContent = null;
         if(self::$layout != null) {
@@ -35,31 +37,13 @@ class View
         }
     }
 
-    /**
-     * Collapse whitespace and remove html comments.
-     * Content of <pre>, <textarea>, <script> and <style> is kept untouched.
-     */
     private function minifyHtml(string $html): string
     {
         if(env('MINIFY_HTML') !== true) {
             return $html;
         }
 
-        // replace protected blocks with placeholders and put them back after minify
-        $preserved = [];
-        $protectedHtml = preg_replace_callback('/<(pre|textarea|script|style)\b.*?<\/\1>/is', function (array $match) use (&$preserved): string {
-            $placeholder = "\x1A" . count($preserved) . "\x1A";
-            $preserved[$placeholder] = $match[0];
-
-            return $placeholder;
-        }, $html);
-
-        $minified = $protectedHtml === null ? null : preg_replace(['/<!--.*?-->/s', '/\s+/'], ['', ' '], $protectedHtml);
-        if($minified === null) {
-            return $html;
-        }
-
-        return strtr($minified, $preserved);
+        return HtmlMinifier::minify($html);
     }
 
     /**

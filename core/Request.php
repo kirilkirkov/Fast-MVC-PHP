@@ -48,7 +48,10 @@ class Request
         $this->parseRequest($routeInfo);
     }
 
-    private function parseRequest($routeInfo)
+    /**
+     * Run the handler for FastRoute dispatch result
+     */
+    public function parseRequest(array $routeInfo)
     {
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::NOT_FOUND:

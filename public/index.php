@@ -25,6 +25,17 @@ require __DIR__.'/../core/Helpers.php';
 
 /*
 |--------------------------------------------------------------------------
+| Register Error Handler
+|--------------------------------------------------------------------------
+|
+| Uncaught exceptions are logged with error_log() and the 500 page is shown
+|
+*/
+
+\Core\ErrorHandler::register();
+
+/*
+|--------------------------------------------------------------------------
 | Call The App Register Services And Bindings
 |--------------------------------------------------------------------------
 */

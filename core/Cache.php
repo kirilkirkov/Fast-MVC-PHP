@@ -30,7 +30,16 @@ class Cache
         $tmpFile = $file . '.' . uniqid('', true) . '.tmp';
         file_put_contents($tmpFile, '<?php '.PHP_EOL.'return '.var_export($array, true).';');
 
-        return rename($tmpFile, $file);
+        if(!rename($tmpFile, $file)) {
+            return false;
+        }
+
+        // otherwise OPcache may keep serving the old version until it revalidates the file
+        if(function_exists('opcache_invalidate')) {
+            opcache_invalidate($file, true);
+        }
+
+        return true;
     }
 
     private static function isCacheDisabled(string $path): bool
